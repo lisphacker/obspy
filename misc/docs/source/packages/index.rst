@@ -44,6 +44,7 @@ The functionality is provided through the following packages:
    :nosignatures:
 
    obspy.core.quakeml
+   obspy.cnv
    obspy.ndk
    obspy.pde
    obspy.zmap

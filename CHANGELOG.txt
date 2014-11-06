@@ -9,6 +9,11 @@
    * `interpolate()` method for Stream/Trace objects.
    * Dictionary values added to an AttribDict will now be converted to an
      AttribDict.
+   * new plugin for CNV event format (used by VELEST) for
+     Catalog/Event.write() (see obspy.cnv and #905)
+ - obspy.cnv:
+   * new plugin to write CNV event files (used by VELEST) from
+     Catalog/Event objects. (see #905)
  - obspy.css:
    * Support for little-endian binary and ASCII files (see #881).
  - obspy.fdsn:
