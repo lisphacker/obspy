@@ -44,7 +44,8 @@ class BenchmarkTestCase(unittest.TestCase):
                 np_err = np.seterr(all="warn")
                 plotBenchmark(sufiles, outfile=ic.name, format='PNG')
                 np.seterr(**np_err)
-            self.assertEqual(len(w), 1, msg='\n'.join(str(x) for x in w))
+            self.assertEqual(len(w), 1,
+                             msg=('NumPy: %s\n' % np.__version__) + '\n'.join(str(x) for x in w))
             self.assertEqual(w[0].category, RuntimeWarning)
             self.assertTrue(str(w[0].message) in
                             ['underflow encountered in divide',
