@@ -24,6 +24,7 @@ def isSEGD(filename):
         print segd.file_headers.general_header1
         print segd.file_headers.general_header2
         print segd.file_headers.general_headerN[0]
+        print segd.file_headers.channel_set_headers[0]
         if segd.file_headers.general_header1.format_code == 8058:
             return True
 

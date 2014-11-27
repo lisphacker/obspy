@@ -118,8 +118,59 @@ class GeneralHeaderN(AttributeEnumerable):
     def __repr__(self):
         return '<General Header {1} - {{{0}}}>'.format(self.enumerate_attributes(), self.block_number)
 
-class ChannelSetHeader(object):
-    pass
+class ChannelSetHeader(AttributeEnumerable):
+    def __init__(self):
+        self.scan_type = 0
+        self.channel_set = 0
+        self.start_time = 0
+        self.end_time = 0
+        self.mp_factor = 1
+        self.num_channels = 0
+        self.channel_type = 0
+        self.num_sub_scans = 0
+        self.gain_control_method = 0
+        self.alias_filter_frequency = 0
+        self.alias_filter_slope = 0
+        self.low_cut_filter_frequency = 0
+        self.low_cut_filter_slope = 0
+        self.first_notch_frqeuency = 0
+        self.second_notch_frqeuency = 0
+        self.third_notch_frqeuency = 0
+        self.extended_channel_set = 0
+        self.extended_header_flag = 0
+        self.num_trace_header_extensions = 0
+        self.vertical_stack = 0
+        self.streamer_cable_number = 0
+        self.array_forming = 0
+
+    def populate_from_buffer(self, byte_buffer):
+        nibble_buffer = bytes_to_nibbles(byte_buffer)
+        
+        self.scan_type = read_bcd(nibble_buffer[0:2])
+        self.channel_set = -1 if ffff(nibble_buffer[0:2]) else read_bcd(nibble_buffer[0:2])
+        self.start_time = read_uint_from_bytes(byte_buffer[2:4])
+        self.end_time = read_uint_from_bytes(byte_buffer[4:6])
+        self.mp_factor = read_q13_from_bytes(byte_buffer[6:8])
+        self.num_channels = read_bcd(nibble_buffer[16:20])
+        self.channel_type = int(nibble_buffer[20])
+        self.num_sub_scans = int(nibble_buffer[22])
+        self.gain_control_method = int(nibble_buffer[23])
+        self.alias_filter_frequency = read_bcd(nibble_buffer[24:28])
+        self.alias_filter_slope = read_bcd(nibble_buffer[29:32])
+        self.low_cut_filter_frequency = read_bcd(nibble_buffer[32:36])
+        self.low_cut_filter_slope = read_bcd(nibble_buffer[37:40])
+        self.first_notch_frqeuency = read_bcd(nibble_buffer[40:44])
+        self.second_notch_frqeuency = read_bcd(nibble_buffer[44:48])
+        self.third_notch_frqeuency = read_bcd(nibble_buffer[48:52])
+        self.extended_channel_set = read_uint_from_bytes(byte_buffer[26:28])
+        self.extended_header_flag = int(nibble_buffer[56])
+        self.num_trace_header_extensions = int(nibble_buffer[57])
+        self.vertical_stack = int(byte_buffer[29])
+        self.streamer_cable_number = int(byte_buffer[30])
+        self.array_forming = int(byte_buffer[31])
+
+    def __repr__(self):
+        return '<Channel set header {1} - {{{0}}}>'.format(self.enumerate_attributes(), self.channel_set)
 
 class ExtendedHeader(object):
     pass

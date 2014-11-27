@@ -8,6 +8,7 @@ Functions and classes for reading a SEGD file.
 GENERAL_HEADER1_SIZE = 32
 GENERAL_HEADER2_SIZE = 32
 GENERAL_HEADERN_SIZE = 32
+CHANNEL_SET_HEADER_SIZE = 32
 
 import numpy as np
 from obspy.segd.segd import *
@@ -23,16 +24,19 @@ class SEGDReader(object):
     def read(self):
         segd = SEGD()
 
+        fh = segd.file_headers
+        
         # Read general headers
-        segd.file_headers.general_header1 = self.read_general_header1()
-        if segd.file_headers.general_header1.num_additional_general_headers >= 1:
-            segd.file_headers.general_header2 = self.read_general_header2()
-        for i in xrange(1, segd.file_headers.general_header1.num_additional_general_headers):
-            segd.file_headers.general_headerN.append(self.read_general_headerN())
+        fh.general_header1 = self.read_general_header1()
+        if fh.general_header1.num_additional_general_headers >= 1:
+            fh.general_header2 = self.read_general_header2()
+        for i in xrange(1, fh.general_header1.num_additional_general_headers):
+            fh.general_headerN.append(self.read_general_headerN())
 
         # Read channel set headers
         num_channel_sets = segd.get_num_channel_sets()
-        print num_channel_sets
+        for i in xrange(num_channel_sets):
+            fh.channel_set_headers.append(self.read_channel_set_header())
         
         return segd
 
@@ -53,3 +57,9 @@ class SEGDReader(object):
         genhdrN = GeneralHeaderN()
         genhdrN.populate_from_buffer(byte_buffer)
         return genhdrN
+
+    def read_channel_set_header(self):
+        byte_buffer = read_bytes(self.file_obj, CHANNEL_SET_HEADER_SIZE)
+        chsethdr = ChannelSetHeader()
+        chsethdr.populate_from_buffer(byte_buffer)
+        return chsethdr

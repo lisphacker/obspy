@@ -34,3 +34,15 @@ def read_sint_from_bytes(bytes):
     for byte in bytes:
         val = val * 256 + int(byte)
     return val
+
+def read_q13_from_bytes(bytes):
+    msb = 1
+    lsb = 0
+    
+    s = bytes[msb] >> 7
+    c = (bytes[msb] >> 2) & 31
+    q = ((int(bytes[msb]) & 3) << 8) | int(bytes[lsb])
+
+    sign = 1 if s == 0 else -1
+    
+    return sign * (float(c) + float(q) / 1024.0)
