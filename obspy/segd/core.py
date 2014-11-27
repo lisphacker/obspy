@@ -21,6 +21,9 @@ def isSEGD(filename):
     with open(filename) as f:
         reader = SEGDReader(f, headers_only = True)
         segd = reader.read()
+        print segd.file_headers.general_header1
+        print segd.file_headers.general_header2
+        print segd.file_headers.general_headerN[0]
         if segd.file_headers.general_header1.format_code == 8058:
             return True
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 '''
-obspy.segd - SEG-D read and write support for ObsPy
+obspy.segd - SEG-D read support for ObsPy
 ==========================================================
 
-The obspy.segd package contains methods in order to read and write files in the
+The obspy.segd package contains methods in order to read files in the
 `SEG-D rev 2.1 <http://www.seg.org/documents/10161/77915/seg_d_rev2.1.pdf>` format.
 
 :copyright:

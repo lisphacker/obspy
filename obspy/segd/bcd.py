@@ -22,3 +22,15 @@ def read_bcd(nibbles):
     for nibble in nibbles:
         val = val * 10 + nibble
     return val
+
+def read_uint_from_bytes(bytes):
+    val = 0
+    for byte in bytes:
+        val = val * 256 + int(byte)
+    return val
+
+def read_sint_from_bytes(bytes):
+    val = 0
+    for byte in bytes:
+        val = val * 256 + int(byte)
+    return val
