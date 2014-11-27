@@ -89,7 +89,7 @@ KEYWORDS = [
     'instrument simulation', 'IRIS', 'magnitude', 'MiniSEED', 'misfit',
     'mopad', 'MSEED', 'NDK', 'NERA', 'NERIES', 'observatory', 'ORFEUS',
     'picker', 'processing', 'PQLX', 'Q', 'real time', 'realtime', 'RESP',
-    'response file', 'RT', 'SAC', 'SEED', 'SeedLink', 'SEG-2', 'SEG Y',
+    'response file', 'RT', 'SAC', 'SEED', 'SeedLink', 'SEG-2', 'SEG Y', 'SEG D'
     'SEISAN', 'SeisHub', 'Seismic Handler', 'seismology', 'seismogram',
     'seismograms', 'signal', 'slink', 'spectrogram', 'StationXML', 'taper',
     'taup', 'travel time', 'trigger', 'VERCE', 'WAV', 'waveform', 'WaveServer',
@@ -147,6 +147,7 @@ ENTRY_POINTS = {
         'Y = obspy.y.core',
         'SEG2 = obspy.seg2.seg2',
         'SEGY = obspy.segy.core',
+        'SEGD = obspy.segd.core',
         'SU = obspy.segy.core',
         'SEISAN = obspy.seisan.core',
         'Q = obspy.sh.core',
@@ -209,6 +210,11 @@ ENTRY_POINTS = {
         'isFormat = obspy.segy.core:isSEGY',
         'readFormat = obspy.segy.core:readSEGY',
         'writeFormat = obspy.segy.core:writeSEGY',
+    ],
+    'obspy.plugin.waveform.SEGD': [
+        'isFormat = obspy.segd.core:isSEGD',
+        'readFormat = obspy.segd.core:readSEGD',
+        'writeFormat = obspy.segd.core:writeSEGD',
     ],
     'obspy.plugin.waveform.SU': [
         'isFormat = obspy.segy.core:isSU',

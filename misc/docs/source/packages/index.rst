@@ -33,6 +33,7 @@ The functionality is provided through the following packages:
    obspy.seisan
    obspy.seg2
    obspy.segy
+   obspy.segd
    obspy.sh
    obspy.wav
    obspy.y
