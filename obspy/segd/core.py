@@ -2,9 +2,10 @@
 Entry points for the segd module.
 
 @author: Gautham Ganapathy
-@organization: Halliburton (http://www.halliburton.com)
 @contact: gautham@lisphacker.org
 '''
+
+from obspy.segd.reader import SEGDReader
 
 def isSEGD(filename):
     '''
@@ -17,11 +18,16 @@ def isSEGD(filename):
     @rtype bool
     '''
 
-    print 'Checking {0} for SEGD'.format(filename)
-    return True
+    with open(filename) as f:
+        reader = SEGDReader(f, headers_only = True)
+        segd = reader.read()
+        if segd.file_headers.general_header1.format_code == 8058:
+            return True
+
+    return False
 
 
-def readSEGD(filename, headers_only = False, byte_order = None,
+def readSEGD(filename, headers_only = False, byte_order = False,
              textual_header_encoding = None, unpack_trace_headers = False,
              **kw_args):
     '''
@@ -29,8 +35,9 @@ def readSEGD(filename, headers_only = False, byte_order = None,
     
     '''
 
-    print 'Reading file ', filename
-    return None
+    with open(filename) as f:
+        reader = SEGDReader(f, headers_only = headers_only)
+        return reader.read()
 
 
     
