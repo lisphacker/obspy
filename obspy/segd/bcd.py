@@ -46,3 +46,9 @@ def read_q13_from_bytes(bytes):
     sign = 1 if s == 0 else -1
     
     return sign * (float(c) + float(q) / 1024.0)
+
+def read_double(bytes):
+    return np.frombuffer(bytes, dtype = '>f8', count = 1)[0]
+
+def read_float(bytes):
+    return np.frombuffer(bytes, dtype = '>f4', count = 1)[0]

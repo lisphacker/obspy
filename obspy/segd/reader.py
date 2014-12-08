@@ -13,6 +13,7 @@ EXTENDED_HEADER_SIZE = 32
 GENERAL_TRACE_HEADER_SIZE = 20
 TRACE_HEADER_EXTENSION_SIZE = 32
 
+import os
 import numpy as np
 from obspy.segd.segd import *
 from obspy.segd.bcd import *
@@ -56,10 +57,19 @@ class SEGDReader(object):
             trace = Trace()
             trace.trace_headers.general_trace_header = self.read_general_trace_header()
 
-            for j in xrange(trace.trace_headers.general_trace_header.number_of_THEs):
+            nTHEs = trace.trace_headers.general_trace_header.number_of_THEs
+            trace.trace_headers.trace_header_extensions = [None] * nTHEs
+            for j in xrange(nTHEs):
                 the = self.read_trace_header_extension(j + 1)
-                trace.trace_headers.trace_header_extensions.append(the)
-            
+                trace.trace_headers.trace_header_extensions[j] = the
+
+            trace_len_bytes = segd.get_samples_per_trace(i) * 4
+
+            if self.headers_only:
+                self.file_obj.seek(trace_len_bytes, os.SEEK_CUR)
+            else:
+                raise 'Trace data read not supported yet'
+
             segd.traces.append(trace)
         
         return segd

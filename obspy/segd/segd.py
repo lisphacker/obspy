@@ -277,11 +277,21 @@ class TraceHeaderExtension1(TraceHeaderExtension):
 
 class TraceHeaderExtension2(TraceHeaderExtension):
     def __init__(self):
-        pass
+        TraceHeaderExtension.__init__(self)
+
+        self.easting = 0
+        self.northing = 0
+        self.elevation = 0
+        self.sensor_orientation = 0
     
     def populate_from_buffer(self, byte_buffer):
-        pass
+        nibble_buffer = bytes_to_nibbles(byte_buffer)
 
+        self.easting = read_double(byte_buffer[0:8])
+        self.northing = read_double(byte_buffer[8:16])
+        self.elevation = read_float(byte_buffer[16:20])
+        self.sensor_orientation = read_bcd(nibble_buffer[49:50])
+                                   
     def __repr__(self):
         return '<Trace header extension 2 - {{{0}}}>'.format(self.enumerate_attributes())
 
@@ -331,6 +341,26 @@ class SEGD(object):
     
     def get_num_traces(self):
         return reduce(lambda x, y: x + y, [ch_set_hdr.num_channels for ch_set_hdr in self.file_headers.channel_set_headers])
-             
+
+    def get_sample_interval(self, trace_idx):
+        sample_microsecs = (self.file_headers.general_header1.base_scan_interval * 1000) / 16
+        return float(sample_microsecs) * 0.000001
+        
+    def get_samples_per_trace(self, trace_idx):
+        the1 = self.traces[trace_idx].trace_header_extensions[0]
+        
+        if the1 is not None:
+            return the1.samples_per_trace
+        else:
+            fh = self.file_headers
+            if fh.general_header1.record_length == 1665:
+                trace_time = float(fh.general_header2.record_length) * .001
+            else:
+                trace_time = float(fh.general_header1.record_length) * .5 * 1.024
+
+            sample_interval = self.get_sample_interval(trace_idx)
+
+            return int(trace_time / sample_interval + 0.5) + 1
+
     def __iter__(self):
         return iter(self.traces)

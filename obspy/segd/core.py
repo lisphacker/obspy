@@ -44,17 +44,18 @@ def readSEGD(filename, headers_only = False, byte_order = False,
         reader = SEGDReader(f, headers_only = headers_only)
         segd = reader.read()
 
-    #print segd.file_headers.general_header1
-    #print segd.file_headers.general_header2
+    print segd.file_headers.general_header1
+    print segd.file_headers.general_header2
     #print segd.file_headers.general_headerN[0]
     #print 'num ch sets', len(segd.file_headers.channel_set_headers)
     #print segd.file_headers.channel_set_headers[0]
     #print segd.file_headers.extended_headers[0]
     #print segd.file_headers.extended_headers[1]
     #print segd.file_headers.extended_headers[2]
-    print segd.traces[0].trace_headers.general_trace_header
-    print segd.traces[0].trace_headers.trace_header_extensions[0]
-    print segd.traces[0].trace_headers.trace_header_extensions[1]
+    #print segd.traces[0].trace_headers.general_trace_header
+    #print segd.traces[0].trace_headers.trace_header_extensions[0]
+    #print segd.traces[0].trace_headers.trace_header_extensions[1]
+    
     return stream
     
 
