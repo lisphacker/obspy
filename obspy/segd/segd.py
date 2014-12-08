@@ -172,8 +172,28 @@ class ChannelSetHeader(AttributeEnumerable):
     def __repr__(self):
         return '<Channel set header {1} - {{{0}}}>'.format(self.enumerate_attributes(), self.channel_set)
 
-class ExtendedHeader(object):
-    pass
+class ExtendedHeader(AttributeEnumerable):
+    def __init__(self):
+        self.seg_manufacturing_code = 0
+        self.manufacturing_sponsorship_code = 0
+        self.content_type = 0
+        self.content_version = 0
+        self.content_compat_version = 0
+        self.total_number_of_32byte_blocks = 0
+
+    def populate_from_buffer(self, byte_buffer):
+        nibble_buffer = bytes_to_nibbles(byte_buffer)
+
+        self.seg_manufacturing_code = read_uint_from_bytes(byte_buffer[0:1])
+        self.manufacturing_sponsorship_code = read_uint_from_bytes(byte_buffer[1:3])
+        self.content_type = read_uint_from_bytes(byte_buffer[3:4])
+        self.content_version = read_uint_from_bytes(byte_buffer[4:5])
+        self.content_compat_version = read_bcd(nibble_buffer[20:21])
+        self.total_number_of_32byte_blocks = read_uint_from_bytes(byte_buffer[6:8])
+
+    def __repr__(self):
+        return '<Extended header - {{{0}}}>'.format(self.enumerate_attributes())
+
 
 class ExternalHeader(object):
     pass
