@@ -208,20 +208,92 @@ class FileHeaders(object):
         self.extended_headers = []
         self.external_headers = []
 
-class TraceHeader(object):
-    pass
+class GeneralTraceHeader(AttributeEnumerable):
+    def __init__(self):
+        self.file_number = 0
+        self.scan_type_number = 0
+        self.channel_set_number = 0
+        self.trace_number = 0
+        self.first_timing_word = 0
+        self.number_of_THEs = 0
+        self.sample_skew = 0
+        self.trace_edit = 0
+        self.time_break_window = 0
+        self.extended_channel_set_number = 0
+        self.extended_file_number = 0
+        
+    def populate_from_buffer(self, byte_buffer):
+        nibble_buffer = bytes_to_nibbles(byte_buffer)
 
-class TraceHeaderExtension(object):
-    pass
+        self.file_number = read_bcd(nibble_buffer[0:4])
+        self.scan_type_number = read_bcd(nibble_buffer[5:6])
+        self.channel_set_number = read_bcd(nibble_buffer[6:8])
+        self.trace_number = read_bcd(nibble_buffer[8:12])
+        self.first_timing_word = read_uint_from_bytes(byte_buffer[6:9])
+        self.number_of_THEs = read_bcd(nibble_buffer[18:20])
+        self.sample_skew = read_uint_from_bytes(byte_buffer[10:11])
+        self.trace_edit = read_uint_from_bytes(byte_buffer[11:12])
+        self.time_break_window = read_uint_from_bytes(byte_buffer[12:15])
+        self.extended_channel_set_number = read_uint_from_bytes(byte_buffer[15:17])
+        self.extended_file_number = read_uint_from_bytes(byte_buffer[17:20])
+
+    def __repr__(self):
+        return '<General trace header {1} - {{{0}}}>'.format(self.enumerate_attributes(), self.trace_number)
+
+class TraceHeaderExtension(AttributeEnumerable):
+    def __init__(self):
+        pass
+    
+    def populate_from_buffer(self, byte_buffer):
+        pass
+
+    def __repr__(self):
+        return '<Trace header extension>'
 
 class TraceHeaderExtension1(TraceHeaderExtension):
-    pass
+    def __init__(self):
+        TraceHeaderExtension.__init__(self)
+        
+        self.receiver_line_number = 0
+        self.receiver_point_number = 0
+        self.receiver_point_index = 0
+        self.samples_per_trace = 0
+        self.extended_receiver_line_number = 0
+        self.extended_receiver_point_number = 0
+        self.sensor_type = 0
+    
+    def populate_from_buffer(self, byte_buffer):
+        self.receiver_line_number = read_uint_from_bytes(byte_buffer[0:3])
+        self.receiver_point_number = read_uint_from_bytes(byte_buffer[3:6])
+        self.receiver_point_index = read_uint_from_bytes(byte_buffer[6:7])
+        self.samples_per_trace = read_uint_from_bytes(byte_buffer[7:10])
+        self.extended_receiver_line_number = float(read_uint_from_bytes(byte_buffer[10:15])) / 65535.0
+        self.extended_receiver_point_number = float(read_uint_from_bytes(byte_buffer[15:20])) / 65535.0
+        self.sensor_type = read_uint_from_bytes(byte_buffer[20:21])
+    
+    def __repr__(self):
+        return '<Trace header extension 1 - {{{0}}}>'.format(self.enumerate_attributes())
+
+
+class TraceHeaderExtension2(TraceHeaderExtension):
+    def __init__(self):
+        pass
+    
+    def populate_from_buffer(self, byte_buffer):
+        pass
+
+    def __repr__(self):
+        return '<Trace header extension 2 - {{{0}}}>'.format(self.enumerate_attributes())
 
 class TraceHeaders(object):
-    pass
+    def __init__(self):
+        self.general_trace_header = GeneralTraceHeader()
+        self.trace_header_extensions = []
     
 class Trace(object):
-    pass
+    def __init__(self):
+        self.trace_headers = TraceHeaders()
+        self.data = None
 
 class SEGDException(Exception):
     pass
@@ -254,7 +326,11 @@ class SEGD(object):
 
         raise SEGDException('Unable to compute number of channel sets')
 
-        
+    def get_num_channels(self):
+        return self.get_num_traces()
+    
+    def get_num_traces(self):
+        return reduce(lambda x, y: x + y, [ch_set_hdr.num_channels for ch_set_hdr in self.file_headers.channel_set_headers])
              
     def __iter__(self):
         return iter(self.traces)

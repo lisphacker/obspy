@@ -10,6 +10,8 @@ GENERAL_HEADER2_SIZE = 32
 GENERAL_HEADERN_SIZE = 32
 CHANNEL_SET_HEADER_SIZE = 32
 EXTENDED_HEADER_SIZE = 32
+GENERAL_TRACE_HEADER_SIZE = 20
+TRACE_HEADER_EXTENSION_SIZE = 32
 
 import numpy as np
 from obspy.segd.segd import *
@@ -25,8 +27,10 @@ class SEGDReader(object):
     def read(self):
         segd = SEGD()
 
+        ### Read file headers ###
+
         fh = segd.file_headers
-        
+
         # Read general file headers
         fh.general_header1 = self.read_general_header1()
         if fh.general_header1.num_additional_general_headers >= 1:
@@ -46,7 +50,18 @@ class SEGDReader(object):
 
             for i in xrange(1, ext_hdr.total_number_of_32byte_blocks):
                 read_bytes(self.file_obj, EXTENDED_HEADER_SIZE)
+
+        ### Read traces ###
+        for i in xrange(segd.get_num_traces()):
+            trace = Trace()
+            trace.trace_headers.general_trace_header = self.read_general_trace_header()
+
+            for j in xrange(trace.trace_headers.general_trace_header.number_of_THEs):
+                the = self.read_trace_header_extension(j + 1)
+                trace.trace_headers.trace_header_extensions.append(the)
             
+            segd.traces.append(trace)
+        
         return segd
 
     def read_general_header1(self):
@@ -79,3 +94,19 @@ class SEGDReader(object):
         exthdr.populate_from_buffer(byte_buffer)
         return exthdr
     
+    def read_general_trace_header(self):
+        byte_buffer = read_bytes(self.file_obj, GENERAL_TRACE_HEADER_SIZE)
+        gentrchdr = GeneralTraceHeader()
+        gentrchdr.populate_from_buffer(byte_buffer)
+        return gentrchdr
+    
+    def read_trace_header_extension(self, idx):
+        byte_buffer = read_bytes(self.file_obj, TRACE_HEADER_EXTENSION_SIZE)
+        if idx == 1:
+            the = TraceHeaderExtension1()
+        elif idx == 2:
+            the = TraceHeaderExtension2()
+        else:
+            the = TraceHeaderExtension2()
+        the.populate_from_buffer(byte_buffer)
+        return the
